@@ -1,0 +1,22 @@
+name: Queue probe
+on:
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect event and commit
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
+          BASE_REF: ${{ github.event.merge_group.base_ref }}
+          HEAD_REF: ${{ github.event.merge_group.head_ref }}
+        run: |
+          printf 'event=%s\nref=%s\nsha=%s\nbase_ref=%s\nhead_ref=%s\n' "$EVENT" "$REF" "$SHA" "$BASE_REF" "$HEAD_REF"
+          git log -1 --format='commit=%H%nparents=%P'
